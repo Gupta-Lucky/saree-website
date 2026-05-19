@@ -327,8 +327,10 @@ h3 { font-size: 24px; }
 
 .hero {
   min-height: 610px;
-  background: linear-gradient(90deg, rgba(25, 18, 13, 0.58), rgba(25, 18, 13, 0.06)),
-    var(--hero-img) center 40% / cover;
+  background-image: linear-gradient(90deg, rgba(25, 18, 13, 0.58), rgba(25, 18, 13, 0.06)), var(--hero-img);
+  background-position: center 40%;
+  background-size: cover;
+  background-repeat: no-repeat;
   display: flex;
   align-items: center;
   color: #fff;
@@ -391,7 +393,7 @@ h3 { font-size: 24px; }
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(34, 22, 15, .72), rgba(34, 22, 15, .1)), url('images/designer-saree-bg.jpg');
+  background: linear-gradient(90deg, rgba(34, 22, 15, .72), rgba(34, 22, 15, .1));
 }
 
 .category-card > div,
@@ -578,7 +580,10 @@ h3 { font-size: 24px; }
   min-height: 220px;
   display: flex;
   align-items: center;
-  background: var(--story-img) center 42% / cover;
+  background-image: var(--story-img);
+  background-position: center 42%;
+  background-size: cover;
+  background-repeat: no-repeat;
   color: #fff;
   position: relative;
 }
