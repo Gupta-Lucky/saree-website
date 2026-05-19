@@ -1,9 +1,8 @@
 const WHATSAPP_NUMBER = "919263413181";
-const CHECKOUT_DISCOUNT_RATE = 0.1;
-const CART_KEY = "houseOfSathiCart";
-const BUY_NOW_KEY = "houseOfSathiBuyNowItem";
-const CHECKOUT_MODE_KEY = "houseOfSathiCheckoutMode";
-const CHECKOUT_DETAILS_KEY = "houseOfSathiCheckoutDetails";
+const CART_KEY = "ramsareesCart";
+const BUY_NOW_KEY = "ramsareesBuyNowItem";
+const CHECKOUT_MODE_KEY = "ramsareesCheckoutMode";
+const CHECKOUT_DETAILS_KEY = "ramsareesCheckoutDetails";
 
 const PRODUCT_DESCRIPTIONS = {
   "cotton-floral":
@@ -768,9 +767,103 @@ PRODUCTS.push(
   ),
 );
 
-const rupee = (amount) => `Rs. ${Number(amount).toLocaleString("en-IN")}`;
+const variationColorPool = [
+  "Cream",
+  "Rose",
+  "Emerald",
+  "Mauve",
+  "Aqua",
+  "Gold",
+  "Rust",
+  "Pink",
+  "Blue",
+  "Ivory",
+  "Sage",
+  "Wine",
+];
+
+const colorHex = {
+  Aqua: "#9fcfc9",
+  Beige: "#d9c3a5",
+  Blue: "#557ca8",
+  Copper: "#b8734e",
+  Cream: "#eadfcd",
+  Emerald: "#2f6f55",
+  Gold: "#c9a34e",
+  Green: "#416b4f",
+  Ivory: "#f1eadc",
+  Mauve: "#a5798e",
+  Olive: "#778052",
+  Peach: "#efb092",
+  Pink: "#dd8fa6",
+  Rose: "#b76a76",
+  Rust: "#a95735",
+  Sage: "#9aaa81",
+  Wine: "#7c3044",
+};
+
+const rupee = (amount) => `₹${Number(amount).toLocaleString("en-IN")}`;
 const qs = (selector, root = document) => root.querySelector(selector);
 const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+function fakeMrp(price) {
+  return Math.ceil((Number(price) * 1.65) / 50) * 50 - 1;
+}
+
+function discountPercent(price) {
+  const mrp = fakeMrp(price);
+  return Math.round(((mrp - Number(price)) / mrp) * 100);
+}
+
+function priceHtml(price) {
+  return `
+    <div class="price-row">
+      <span class="sale-price">${rupee(price)}</span>
+      <span class="mrp-price">${rupee(fakeMrp(price))}</span>
+      <span class="discount-badge">${discountPercent(price)}% OFF</span>
+    </div>`;
+}
+
+function variationColors(product) {
+  const used = new Set([product.color]);
+  const start = Math.max(0, variationColorPool.indexOf(product.color));
+  return product.gallery.map((_, index) => {
+    if (index === 0) return product.color;
+    let next =
+      variationColorPool[(start + index + product.id.length) % variationColorPool.length];
+    while (used.has(next)) {
+      next =
+        variationColorPool[
+          (variationColorPool.indexOf(next) + 1) % variationColorPool.length
+        ];
+    }
+    used.add(next);
+    return next;
+  });
+}
+
+function productVariations(product) {
+  const colors = variationColors(product);
+  return product.gallery.map((image, index) => ({
+    index,
+    image,
+    color: colors[index],
+    label: `${colors[index]} ${product.fabric}`,
+  }));
+}
+
+function selectedItemImage(item) {
+  return item.image || item.selectedImage || item.product.image;
+}
+
+function selectedItemColor(item) {
+  return item.color || item.selectedColor || item.product.color;
+}
+
+function selectedItemVariation(item) {
+  if (item.variation) return item.variation;
+  return `${selectedItemColor(item)} ${item.product.fabric}`;
+}
 
 function icon(name) {
   const icons = {
@@ -868,7 +961,7 @@ function footer() {
             <h3>Contact Us</h3>
             <div class="footer-contact">
               <div class="contact-line">${icon("phone")} <span>+91 92634 13181</span></div>
-              <div class="contact-line">${icon("mail")} <span>support@houseofsathi.com</span></div>
+              <div class="contact-line">${icon("mail")} <span>support@ramsarees.com</span></div>
               <div class="contact-line">${icon("clock")} <span>Mon - Sat: 10:00 AM - 7:00 PM</span></div>
               <div class="contact-line">${icon("pin")} <span>Surat, Gujarat, India - 395002</span></div>
             </div>
@@ -883,7 +976,15 @@ function footer() {
               <a href="https://wa.me/919263413181" target="_blank" rel="noopener" aria-label="WhatsApp">${icon("whatsapp")}</a>
             </div>
             <h3 style="margin-top:30px">We Accept</h3>
-            <div class="payments"><span>VISA</span><span>MC</span><span>UPI</span><span>Paytm</span></div>
+            <div class="payments" aria-label="Accepted payment methods">
+              <span class="pay-upi">UPI</span>
+              <span class="pay-visa">Visa</span>
+              <span class="pay-mastercard">MasterCard</span>
+              <span class="pay-rupay">RuPay</span>
+              <span class="pay-paytm">Paytm</span>
+              <span class="pay-phonepe">PhonePe</span>
+              <span class="pay-gpay">G Pay</span>
+            </div>
           </div>
         </div>
         <div class="copyright">&copy; 2025 RAM SAREES. All Rights Reserved.</div>
@@ -893,12 +994,17 @@ function footer() {
 
 function productCard(product) {
   return `
-    <a class="product-card fade-in" href="product.html?id=${product.id}" data-product-card>
-      <span class="image"><img src="${product.image}" alt="${product.name}" loading="lazy"></span>
-      <h3>${product.name}</h3>
-      <p class="product-card-desc">${product.description}</p>
-      <div class="price">${rupee(product.price)}</div>
-    </a>`;
+    <article class="product-card fade-in" data-product-card>
+      <a class="product-card-link" href="product.html?id=${product.id}" aria-label="View ${product.name}">
+        <span class="image"><img src="${product.image}" alt="${product.name}" loading="lazy"></span>
+        <h3>${product.name}</h3>
+        <p class="product-card-desc">${product.description}</p>
+        <div class="price">${priceHtml(product.price)}</div>
+      </a>
+      <div class="product-card-actions">
+        <a class="card-buy-now" href="checkout.html?checkout=buy-now" data-card-buy-now="${product.id}">Buy Now</a>
+      </div>
+    </article>`;
 }
 
 function getCart() {
@@ -910,18 +1016,42 @@ function setCart(cart) {
   updateCartCount();
 }
 
-function addToCart(productId, qty = 1) {
+function addToCart(productId, qty = 1, selection = {}) {
   const cart = getCart();
-  const item = cart.find((entry) => entry.id === productId);
+  const product = PRODUCTS.find((entry) => entry.id === productId);
+  const defaultVariation = product ? productVariations(product)[0] : {};
+  const cartItem = {
+    id: productId,
+    qty,
+    image: selection.image || defaultVariation.image,
+    color: selection.color || defaultVariation.color,
+    variationIndex: Number(selection.variationIndex ?? selection.index) || 0,
+    variation: selection.variation || selection.label || defaultVariation.label,
+  };
+  const item = cart.find(
+    (entry) =>
+      entry.id === productId &&
+      selectedItemImage({ ...entry, product }) === cartItem.image &&
+      selectedItemColor({ ...entry, product }) === cartItem.color,
+  );
   if (item) item.qty += qty;
-  else cart.push({ id: productId, qty });
+  else cart.push(cartItem);
   setCart(cart);
 }
 
-function setBuyNowItem(productId, qty = 1) {
+function setBuyNowItem(productId, qty = 1, selection = {}) {
+  const product = PRODUCTS.find((entry) => entry.id === productId);
+  const defaultVariation = product ? productVariations(product)[0] : {};
   localStorage.setItem(
     BUY_NOW_KEY,
-    JSON.stringify({ id: productId, qty: Math.max(1, Number(qty) || 1) }),
+    JSON.stringify({
+      id: productId,
+      qty: Math.max(1, Number(qty) || 1),
+      image: selection.image || defaultVariation.image,
+      color: selection.color || defaultVariation.color,
+      variationIndex: Number(selection.variationIndex ?? selection.index) || 0,
+      variation: selection.variation || selection.label || defaultVariation.label,
+    }),
   );
   localStorage.setItem(CHECKOUT_MODE_KEY, "buy-now");
 }
@@ -973,6 +1103,12 @@ function initChrome() {
   });
 
   document.addEventListener("click", (event) => {
+    const cardBuyNow = event.target.closest("[data-card-buy-now]");
+    if (cardBuyNow) {
+      setBuyNowItem(cardBuyNow.dataset.cardBuyNow, 1);
+      return;
+    }
+
     const panel = qs("#searchPanel");
     if (!panel) return;
     if (
@@ -1027,27 +1163,56 @@ function selectedProduct() {
 
 function initProduct() {
   const product = selectedProduct();
+  const variations = productVariations(product);
+  let selectedVariation = variations[0];
   let qty = 1;
+  const renderVariation = (variation) => {
+    selectedVariation = variation;
+    qs("#productPrice").innerHTML = priceHtml(product.price);
+    qs("#fabricInfo").textContent =
+      `${product.fabric} | ${variation.color} finish | Crafted in small boutique batches`;
+    qs("#productColor").textContent = variation.color;
+    qs("#mainProductImage").src = variation.image;
+    qs("#mainProductImage").alt = `${product.name} in ${variation.color}`;
+    qsa("#thumbs button").forEach((button) => {
+      button.classList.toggle(
+        "active",
+        Number(button.dataset.variationIndex) === variation.index,
+      );
+    });
+    qsa(".swatch").forEach((button) => {
+      button.classList.toggle(
+        "active",
+        Number(button.dataset.variationIndex) === variation.index,
+      );
+    });
+  };
   qs("#breadcrumbName").textContent = product.name;
   qs("#productName").textContent = product.name;
-  qs("#productPrice").textContent = rupee(product.price);
   qs("#productDesc").textContent = product.description;
-  qs("#fabricInfo").textContent =
-    `${product.fabric} | ${product.color} finish | Crafted in small boutique batches`;
-  qs("#productColor").textContent = product.color;
-  qs("#mainProductImage").src = product.gallery[0];
-  qs("#mainProductImage").alt = product.name;
-  qs("#thumbs").innerHTML = product.gallery
+  qs("#thumbs").innerHTML = variations
     .map(
-      (src) =>
-        `<button type="button"><img src="${src}" alt="${product.name}" loading="lazy"></button>`,
+      (variation) =>
+        `<button type="button" data-variation-index="${variation.index}" aria-label="Select ${variation.color} color"><img src="${variation.image}" alt="${product.name} in ${variation.color}" loading="lazy"></button>`,
+    )
+    .join("");
+  qs(".swatches").innerHTML = variations
+    .map(
+      (variation) =>
+        `<button class="swatch" type="button" data-variation-index="${variation.index}" style="background:${colorHex[variation.color] || "#d8c4ad"}" aria-label="Select ${variation.color} color"></button>`,
     )
     .join("");
   qsa("#thumbs button").forEach((button) => {
     button.addEventListener("click", () => {
-      qs("#mainProductImage").src = qs("img", button).src;
+      renderVariation(variations[Number(button.dataset.variationIndex)] || variations[0]);
     });
   });
+  qsa(".swatch").forEach((button) => {
+    button.addEventListener("click", () => {
+      renderVariation(variations[Number(button.dataset.variationIndex)] || variations[0]);
+    });
+  });
+  renderVariation(selectedVariation);
   qs("#qtyValue").textContent = qty;
   qs("#minusQty").addEventListener("click", () => {
     qty = Math.max(1, qty - 1);
@@ -1058,11 +1223,11 @@ function initProduct() {
     qs("#qtyValue").textContent = qty;
   });
   qs("#addToCart").addEventListener("click", () => {
-    addToCart(product.id, qty);
+    addToCart(product.id, qty, selectedVariation);
     location.href = "cart.html";
   });
   qs("#buyNow").addEventListener("click", () => {
-    setBuyNowItem(product.id, qty);
+    setBuyNowItem(product.id, qty, selectedVariation);
     location.href = "checkout.html?checkout=buy-now";
   });
 }
@@ -1076,12 +1241,12 @@ function initCart() {
     return;
   }
   rows.innerHTML = cart
-    .map((item) => {
+    .map((item, index) => {
       const product = PRODUCTS.find((p) => p.id === item.id);
       return `
-      <div class="cart-row" data-id="${item.id}">
-        <img src="${product.image}" alt="${product.name}" loading="lazy">
-        <div><h3>${product.name}</h3><p>${product.fabric} Saree</p></div>
+      <div class="cart-row" data-cart-index="${index}">
+        <img src="${selectedItemImage({ ...item, product })}" alt="${product.name}" loading="lazy">
+        <div><h3>${product.name}</h3><p>${selectedItemColor({ ...item, product })} ${product.fabric} Saree</p></div>
         <div class="qty"><div class="qty-control"><button data-action="dec">-</button><span>${item.qty}</span><button data-action="inc">+</button></div></div>
         <strong class="line-price">${rupee(product.price * item.qty)}</strong>
         <button class="remove" aria-label="Remove item" data-action="remove">x</button>
@@ -1093,7 +1258,7 @@ function initCart() {
     const action = event.target.dataset.action;
     if (!action) return;
     const row = event.target.closest(".cart-row");
-    const item = cart.find((entry) => entry.id === row.dataset.id);
+    const item = cart[Number(row.dataset.cartIndex)];
     if (action === "inc") item.qty += 1;
     if (action === "dec") item.qty = Math.max(1, item.qty - 1);
     if (action === "remove") cart.splice(cart.indexOf(item), 1);
@@ -1131,7 +1296,7 @@ function buyNowItems() {
   if (!item?.id) return [];
   const product = PRODUCTS.find((p) => p.id === item.id);
   if (!product) return [];
-  return [{ id: item.id, qty: Math.max(1, Number(item.qty) || 1), product }];
+  return [{ ...item, id: item.id, qty: Math.max(1, Number(item.qty) || 1), product }];
 }
 
 function checkoutMode() {
@@ -1225,24 +1390,26 @@ function initContact() {
 
 function checkoutTotals() {
   const items = checkoutItems();
-  const mrp = items.reduce((sum, item) => sum + item.product.price * item.qty, 0);
-  const discount = Math.round(mrp * CHECKOUT_DISCOUNT_RATE);
+  const mrp = items.reduce((sum, item) => sum + fakeMrp(item.product.price) * item.qty, 0);
+  const payable = items.reduce((sum, item) => sum + item.product.price * item.qty, 0);
+  const discount = Math.max(0, mrp - payable);
   const fees = 0;
   return {
     items,
     mrp,
     discount,
-    discountPercent: mrp ? Math.round(CHECKOUT_DISCOUNT_RATE * 100) : 0,
+    discountPercent: mrp ? Math.round((discount / mrp) * 100) : 0,
     fees,
-    total: Math.max(0, mrp + fees - discount),
+    total: Math.max(0, payable + fees),
   };
 }
 
-function checkoutProductImageUrl(product) {
+function checkoutProductImageUrl(item) {
+  const image = selectedItemImage(item);
   try {
-    return new URL(product.image, location.href).href;
+    return new URL(image, location.href).href;
   } catch {
-    return product.image;
+    return image;
   }
 }
 
@@ -1313,9 +1480,9 @@ function validateCheckoutForm(form) {
     phone: /^[6-9]\d{9}$/.test(details.phone)
       ? ""
       : "Please enter a valid 10 digit Indian mobile number.",
-    color: /^[A-Za-z ]{3,24}$/.test(details.color)
+    color: checkoutColorOptions().includes(details.color)
       ? ""
-      : "Please enter a valid color using letters only.",
+      : "Please select an available product color.",
   };
 
   const fullName = fullCheckoutName(details).toLowerCase();
@@ -1354,6 +1521,20 @@ function saveCheckoutDetails(form) {
 function renderCheckoutSummary() {
   const totals = checkoutTotals();
   const disabled = !totals.items.length;
+  qs("#checkoutSummaryProducts").innerHTML = totals.items.length
+    ? totals.items
+        .map(
+          (item) => `
+      <article class="summary-product">
+        <img src="${selectedItemImage(item)}" alt="${item.product.name}" loading="lazy">
+        <div>
+          <h4>${item.product.name}</h4>
+          <p>${selectedItemColor(item)} | Qty ${item.qty}</p>
+        </div>
+      </article>`,
+        )
+        .join("")
+    : "";
   qs("#checkoutMrp").textContent = rupee(totals.mrp);
   qs("#checkoutShipping").textContent = totals.fees ? rupee(totals.fees) : "Free";
   qs("#checkoutDiscount").textContent = `- ${rupee(totals.discount)}`;
@@ -1363,6 +1544,41 @@ function renderCheckoutSummary() {
     ? `You saved ${rupee(totals.discount)} on this order.`
     : "Free delivery applied on this order.";
   qs("#summaryCta").disabled = disabled;
+}
+
+function checkoutColorOptions() {
+  const colors = checkoutItems().flatMap((item) => {
+    const current = selectedItemColor(item);
+    const variants = productVariations(item.product).map((variation) => variation.color);
+    return [current, ...variants];
+  });
+  return [...new Set(colors.filter(Boolean))];
+}
+
+function populateCheckoutColorSelect(form, savedColor = "") {
+  const select = form.elements.color;
+  if (!select) return;
+  const colors = checkoutColorOptions();
+  select.innerHTML = colors.length
+    ? colors
+        .map((color) => `<option value="${escapeHtml(color)}">${escapeHtml(color)}</option>`)
+        .join("")
+    : `<option value="">No color available</option>`;
+  const preferred = colors.includes(savedColor)
+    ? savedColor
+    : selectedItemColor(checkoutItems()[0] || { product: PRODUCTS[0] });
+  select.value = colors.includes(preferred) ? preferred : colors[0] || "";
+}
+
+function syncBuyNowColor(color) {
+  if (checkoutMode() !== "buy-now") return;
+  const item = JSON.parse(localStorage.getItem(BUY_NOW_KEY) || "null");
+  const product = item?.id ? PRODUCTS.find((entry) => entry.id === item.id) : null;
+  if (!product) return;
+  const variation =
+    productVariations(product).find((entry) => entry.color === color) ||
+    productVariations(product)[0];
+  setBuyNowItem(product.id, item.qty, variation);
 }
 
 function renderCheckoutReview(details) {
@@ -1383,16 +1599,17 @@ function renderCheckoutReview(details) {
   qs("#checkoutReviewProducts").innerHTML = totals.items.length
     ? totals.items
         .map(
-          ({ qty, product }) => `
+          (item) => `
       <article class="review-product">
-        <img src="${product.image}" alt="${product.name}" loading="lazy">
+        <img src="${selectedItemImage(item)}" alt="${item.product.name}" loading="lazy">
         <div>
-          <h4>${product.name}</h4>
-          <p>Product Price: ${rupee(product.price)}</p>
+          <h4>${item.product.name}</h4>
+          <p>Product Price: ${rupee(item.product.price)}</p>
           <p>Discount: ${totals.discountPercent}%</p>
-          <p>Selected Quantity: ${qty}</p>
-          <p>Selected Color: ${safeDetails.color}</p>
-          <strong>Final Payable: ${rupee(Math.round(product.price * qty * (1 - CHECKOUT_DISCOUNT_RATE)))}</strong>
+          <p>Selected Quantity: ${item.qty}</p>
+          <p>Selected Color: ${escapeHtml(selectedItemColor(item))}</p>
+          <p>Variation: ${escapeHtml(selectedItemVariation(item))}</p>
+          <strong>Final Payable: ${rupee(item.product.price * item.qty)}</strong>
         </div>
       </article>`,
         )
@@ -1417,7 +1634,8 @@ function setCheckoutStep(step) {
     2: "Continue to Complete Order",
     3: "Order with WhatsApp",
   };
-  qs("#summaryCta").textContent = labels[step];
+  qs("#summaryCta").innerHTML =
+    step === 3 ? `${icon("whatsapp")} ${labels[step]}` : labels[step];
   qs("#summaryCta").dataset.targetStep = String(step);
 }
 
@@ -1426,12 +1644,12 @@ function checkoutWhatsAppMessage(details) {
   const modeLabel = checkoutMode() === "buy-now" ? "Buy Now Checkout" : "Cart Checkout";
   const productLines = totals.items
     .map(
-      ({ qty, product }) =>
-        `- Product Name: ${product.name}\n  Product Image URL: ${checkoutProductImageUrl(product)}\n  Product Price: ${rupee(product.price)}\n  Product Quantity: ${qty}\n  Product Color: ${details.color}`,
+      (item) =>
+        `- Product Name: ${item.product.name}\n  Product Image URL: ${checkoutProductImageUrl(item)}\n  Product Price: ${rupee(item.product.price)}\n  Product Quantity: ${item.qty}\n  Product Color: ${selectedItemColor(item)}\n  Selected Variation: ${selectedItemVariation(item)}`,
     )
     .join("\n\n");
 
-  return `HOUSE OF SATHI Order Request\n\nCheckout Type: ${modeLabel}\n\nPRODUCT DETAILS\n${productLines || "No products selected"}\n\nCUSTOMER DETAILS\nCustomer Full Name: ${fullCheckoutName(details)}\nDelivery Address: ${details.address}\nMobile Number: +91 ${details.phone}\n\nFinal Payable Amount: ${rupee(totals.total)}`;
+  return `RAM SAREES Order Request\n\nCheckout Type: ${modeLabel}\n\nPRODUCT DETAILS\n${productLines || "No products selected"}\n\nCUSTOMER DETAILS\nCustomer Full Name: ${fullCheckoutName(details)}\nDelivery Address: ${details.address}\nMobile Number: +91 ${details.phone}\n\nFinal Payable Amount: ${rupee(totals.total)}`;
 }
 
 function openCheckoutWhatsApp(form, button) {
@@ -1445,7 +1663,7 @@ function openCheckoutWhatsApp(form, button) {
   setTimeout(() => {
     window.open(whatsappUrl(checkoutWhatsAppMessage(details)), "_blank", "noopener");
     button.disabled = false;
-    button.textContent = "Order with WhatsApp";
+    button.innerHTML = `${icon("whatsapp")} Order with WhatsApp`;
   }, 250);
 }
 
@@ -1456,9 +1674,16 @@ function initCheckout() {
   const saved = JSON.parse(
     localStorage.getItem(CHECKOUT_DETAILS_KEY) || "{}",
   );
-  ["firstName", "lastName", "address", "phone", "color"].forEach((name) => {
+  populateCheckoutColorSelect(
+    form,
+    activeItems.length ? selectedItemColor(activeItems[0]) : saved.color,
+  );
+  ["firstName", "lastName", "address", "phone"].forEach((name) => {
     if (saved[name] && form.elements[name]) form.elements[name].value = saved[name];
   });
+  if (!checkoutColorOptions().includes(form.elements.color.value)) {
+    populateCheckoutColorSelect(form);
+  }
 
   if (!activeItems.length) {
     const emptyTitle =
@@ -1481,6 +1706,12 @@ function initCheckout() {
 
   form.elements.phone.addEventListener("input", (event) => {
     event.target.value = phoneDigits(event.target.value).slice(0, 10);
+  });
+
+  form.elements.color.addEventListener("change", (event) => {
+    syncBuyNowColor(event.target.value);
+    renderCheckoutSummary();
+    saveCheckoutDetails(form);
   });
 
   let persistTimer;
@@ -1536,8 +1767,8 @@ function initOrder() {
       <div class="order-mini-list">
         ${items
           .map(
-            ({ qty, product }) =>
-              `<div><span>${product.name} x ${qty}</span><strong>${rupee(product.price * qty)}</strong></div>`,
+            (item) =>
+              `<div><img src="${selectedItemImage(item)}" alt="${item.product.name}" loading="lazy"><span>${item.product.name} (${selectedItemColor(item)}) x ${item.qty}</span><strong>${rupee(item.product.price * item.qty)}</strong></div>`,
           )
           .join("")}
       </div>
@@ -1557,15 +1788,15 @@ function initOrder() {
     const order = items.length
       ? items
           .map(
-            ({ qty, product }) =>
-              `${product.name} x ${qty} - ${rupee(product.price * qty)}`,
+            (item) =>
+              `${item.product.name} x ${item.qty} - ${rupee(item.product.price * item.qty)}\nImage: ${checkoutProductImageUrl(item)}\nColor: ${selectedItemColor(item)}\nVariation: ${selectedItemVariation(item)}`,
           )
           .join("\n")
       : "Custom order";
     const total =
       saved.total ||
       rupee(items.reduce((sum, item) => sum + item.product.price * item.qty, 0));
-    const message = `HOUSE OF SATHI Order Request\n\nOrder Details:\n${order}\n\nTotal Amount: ${total}\nEstimated Delivery: ${saved.estimatedDelivery || estimatedDelivery("")}\n\nCustomer Details:\nName: ${data.get("name")}\nPhone: ${phoneDigits(data.get("phone")).slice(-10)}\nEmail: ${data.get("email") || "Not provided"}\nGender: ${data.get("gender")}\nAddress: ${data.get("address")}\n\nSpecial Instructions:\n${data.get("message") || "No special instructions"}`;
+    const message = `RAM SAREES Order Request\n\nOrder Details:\n${order}\n\nTotal Amount: ${total}\nEstimated Delivery: ${saved.estimatedDelivery || estimatedDelivery("")}\n\nCustomer Details:\nName: ${data.get("name")}\nPhone: ${phoneDigits(data.get("phone")).slice(-10)}\nEmail: ${data.get("email") || "Not provided"}\nGender: ${data.get("gender")}\nAddress: ${data.get("address")}\n\nSpecial Instructions:\n${data.get("message") || "No special instructions"}`;
     window.open(whatsappUrl(message), "_blank", "noopener");
   });
 }
