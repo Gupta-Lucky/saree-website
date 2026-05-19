@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop | RAM SAREES</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="shop">
+  <div id="siteChrome"></div>
+  <main class="container">
+    <div class="page-title"><h1>Shop</h1></div>
+    <div class="shop-layout">
+      <aside class="sidebar">
+        <nav class="filter-block category-filter" aria-label="Product categories">
+          <h3>Categories</h3>
+          <a class="active" href="shop.html">All Sarees</a>
+          <a href="shop.html?category=Cotton%20Sarees">Cotton Sarees</a>
+          <a href="shop.html?category=Designer%20Sarees">Designer Sarees</a>
+          <a href="shop.html?category=Banarasi%20Sarees">Banarasi Sarees</a>
+          <a href="shop.html?category=Silk%20Sarees">Silk Sarees</a>
+          <a href="shop.html?category=Handloom%20Sarees">Handloom Sarees</a>
+          <a href="shop.html?category=New%20Arrivals">New Arrivals</a>
+          <a href="shop.html?category=Best%20Sellers">Best Sellers</a>
+        </nav>
+      </aside>
+      <section>
+        <div class="shop-top"><span>Sort by:</span><select><option>Featured</option><option>Price Low to High</option><option>Newest</option></select></div>
+        <div class="product-grid shop-grid" id="shopGrid"></div>
+      </section>
+    </div>
+  </main>
+  <div id="siteFooter"></div>
+  <script src="app.js"></script>
+</body>
+</html>

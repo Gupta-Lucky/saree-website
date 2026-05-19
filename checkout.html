@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | RAM SAREES</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="checkout">
+  <div id="siteChrome"></div>
+  <main class="container checkout-page">
+    <div class="checkout-heading">
+      <span>Secure checkout</span>
+      <h1>Complete Your Order</h1>
+      <p>Enter your details, review your saree selection, and place the order directly with our team.</p>
+    </div>
+    <section class="checkout-layout">
+      <div class="checkout-main">
+        <ol class="checkout-steps" aria-label="Checkout progress">
+          <li class="active" data-step-indicator="1"><span>1</span>User Info</li>
+          <li data-step-indicator="2"><span>2</span>Review</li>
+          <li data-step-indicator="3"><span>3</span>Complete</li>
+        </ol>
+
+        <section class="checkout-step-panel active" data-checkout-step="1" aria-labelledby="stepOneTitle">
+          <div class="checkout-card">
+            <div class="section-label">Step 1</div>
+            <h2 id="stepOneTitle">User Information</h2>
+            <form class="form checkout-form" id="checkoutForm" novalidate>
+              <div class="form-grid">
+                <label>
+                  <span>First Name</span>
+                  <input name="firstName" type="text" placeholder="First name" autocomplete="given-name" required>
+                  <small class="field-error" data-error-for="firstName"></small>
+                </label>
+                <label>
+                  <span>Last Name</span>
+                  <input name="lastName" type="text" placeholder="Last name" autocomplete="family-name" required>
+                  <small class="field-error" data-error-for="lastName"></small>
+                </label>
+              </div>
+              <label>
+                <span>Delivery Address</span>
+                <textarea name="address" placeholder="House number, street, city, state, pincode" autocomplete="street-address" required></textarea>
+                <small class="field-error" data-error-for="address"></small>
+              </label>
+              <div class="form-grid">
+                <label>
+                  <span>Mobile Number</span>
+                  <input name="phone" type="tel" placeholder="10 digit Indian mobile number" autocomplete="tel" inputmode="numeric" maxlength="10" required>
+                  <small class="field-error" data-error-for="phone"></small>
+                </label>
+                <label>
+                  <span>Product Color</span>
+                  <input name="color" type="text" placeholder="Example: Red, Green, Gold" autocomplete="off" required>
+                  <small class="field-error" data-error-for="color"></small>
+                </label>
+              </div>
+              <button class="btn checkout-next" id="continueReview" type="submit">Continue to Review</button>
+            </form>
+          </div>
+        </section>
+
+        <section class="checkout-step-panel" data-checkout-step="2" aria-labelledby="stepTwoTitle" hidden>
+          <div class="checkout-card">
+            <div class="review-heading">
+              <div>
+                <div class="section-label">Step 2</div>
+                <h2 id="stepTwoTitle">Review & Confirm</h2>
+              </div>
+              <button class="change-btn" id="changeDetails" type="button">Change</button>
+            </div>
+            <div class="review-layout">
+              <div>
+                <h3>Customer Details</h3>
+                <dl class="review-list" id="customerReview"></dl>
+              </div>
+              <div>
+                <h3>Order Details</h3>
+                <div class="checkout-products" id="checkoutReviewProducts"></div>
+              </div>
+            </div>
+            <button class="btn checkout-next" id="confirmReview" type="button">Continue to Complete Order</button>
+          </div>
+        </section>
+
+        <section class="checkout-step-panel" data-checkout-step="3" aria-labelledby="stepThreeTitle" hidden>
+          <div class="checkout-card complete-card">
+            <div class="section-label">Step 3</div>
+            <h2 id="stepThreeTitle">Complete Order</h2>
+            <p>Choose how you want to place this order. Your product and customer details will be ready for confirmation.</p>
+            <div class="order-options">
+              <a class="btn call-btn" href="tel:+919263413181">Order by Call</a>
+              <button class="btn whatsapp-btn" id="whatsappOrder" type="button">Order with WhatsApp</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="price-summary-card checkout-summary" id="priceSummary" aria-label="Order summary">
+        <div class="section-label">Order Summary</div>
+        <div class="summary-line"><span>MRP</span><strong id="checkoutMrp">Rs. 0</strong></div>
+        <div class="summary-line"><span>Fees</span><strong id="checkoutShipping">Free</strong></div>
+        <div class="summary-line"><span>Discount</span><strong id="checkoutDiscount">- Rs. 0</strong></div>
+        <div class="summary-line total"><span>Total Amount</span><strong id="checkoutTotal">Rs. 0</strong></div>
+        <p class="savings-note" id="checkoutSavings">You saved Rs. 0 on this order.</p>
+        <div class="final-price"><span>Final price</span><strong id="checkoutFinal">Rs. 0</strong></div>
+        <button class="btn" id="summaryCta" type="button">Continue to Review</button>
+        <p class="summary-note">Secure checkout with direct call or WhatsApp confirmation.</p>
+      </aside>
+    </section>
+  </main>
+  <div id="siteFooter"></div>
+  <script src="app.js"></script>
+</body>
+</html>
