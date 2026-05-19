@@ -380,7 +380,10 @@ h3 { font-size: 24px; }
   align-items: center;
   padding: 42px;
   color: #fff;
-  background: var(--image) center / cover;
+  background-image: var(--image);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .category-card::before,
@@ -538,7 +541,7 @@ h3 { font-size: 24px; }
 
 .card-buy-now:hover {
   border-color: var(--gold);
-  background: #8E6238;;
+  background: var(--cream);
   transform: translateY(-1px);
 }
 
@@ -1744,7 +1747,7 @@ h3 { font-size: 24px; }
   }
 
   .product-card h3 {
-    font-size: 13.5px;
+    font-size: 18px;
     min-height: 34px;
     margin-top: 8px;
     line-height: 1.25;
