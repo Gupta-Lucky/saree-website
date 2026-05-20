@@ -903,7 +903,7 @@ function header() {
     <div class="topbar">Free Shipping on Prepaid Orders</div>
     <header class="site-header">
       <nav class="nav">
-        <button class="hamburger" aria-label="Open menu">${icon("menu")}</button>
+        <button class="hamburger" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false">${icon("menu")}</button>
         <a class="brand" href="index.html">RAM SAREES</a>
         <div class="nav-links" id="navLinks">
           <a href="index.html">Home</a>
@@ -914,7 +914,7 @@ function header() {
           <a href="contact.html">Contact</a>
         </div>
         <div class="nav-actions">
-          <button class="icon-btn search-toggle" aria-label="Search">${icon("search")}</button>
+          <button class="icon-btn search-toggle" aria-label="Search" aria-controls="searchPanel" aria-expanded="false">${icon("search")}</button>
           <a class="icon-btn" href="cart.html" aria-label="Cart">${icon("bag")}<span class="cart-count">0</span></a>
         </div>
       </nav>
@@ -1074,12 +1074,29 @@ function initChrome() {
     el.innerHTML = icon(el.dataset.icon);
   });
 
-  qs(".hamburger")?.addEventListener("click", () =>
-    qs("#navLinks").classList.toggle("open"),
-  );
-  qs(".search-toggle")?.addEventListener("click", () => {
-    qs("#searchPanel").classList.toggle("open");
-    qs("#searchInput").focus();
+  const hamburger = qs(".hamburger");
+  const searchToggle = qs(".search-toggle");
+  const navLinks = qs("#navLinks");
+  const searchPanel = qs("#searchPanel");
+
+  hamburger?.addEventListener("click", () => {
+    navLinks?.classList.toggle("open");
+    const expanded = navLinks?.classList.contains("open") ? "true" : "false";
+    hamburger?.setAttribute("aria-expanded", expanded);
+  });
+
+  qsa("#navLinks a").forEach((link) => {
+    link.addEventListener("click", () => {
+      navLinks?.classList.remove("open");
+      hamburger?.setAttribute("aria-expanded", "false");
+    });
+  });
+
+  searchToggle?.addEventListener("click", () => {
+    searchPanel?.classList.toggle("open");
+    const expanded = searchPanel?.classList.contains("open") ? "true" : "false";
+    searchToggle?.setAttribute("aria-expanded", expanded);
+    qs("#searchInput")?.focus();
   });
 
   const input = qs("#searchInput");

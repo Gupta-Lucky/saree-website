@@ -81,7 +81,7 @@ textarea {
 
 .brand {
   font-family: "Cormorant Garamond", serif;
-  font-size: 34px;
+  font-size: clamp(22px, 3.6vw, 34px);
   line-height: 1;
   letter-spacing: -0.01em;
 }
@@ -212,7 +212,7 @@ textarea {
 .container {
   max-width: 1210px;
   margin: 0 auto;
-  padding: 0 42px;
+  padding: 0 clamp(16px, 4vw, 42px);
 }
 
 .narrow {
@@ -284,7 +284,7 @@ h3 { font-size: 24px; }
   align-items: center;
   justify-content: center;
   min-height: 48px;
-  padding: 0 34px;
+  padding: 0 clamp(12px, 3vw, 34px);
   border: 1px solid var(--gold);
   background: var(--gold);
   color: #fff;
@@ -316,17 +316,56 @@ h3 { font-size: 24px; }
 
 .btn-outline {
   background: transparent;
-  color: var(--white);
-  border-color: #ffffff;
-}
-
-.btn-outline:hover {
-  color: #fff;
-  border-color: var(--gold-dark);
-}
+   color: #fff;
+   border-color: #ffffff;
+ }
+ 
+ .btn-outline:hover {
+   color: #fff;
+   border-color: var(--gold-dark);
+ }
+ 
+ .btn-dark {
+   background: var(--brown);
+   border-color: var(--brown);
+   color: #fff;
+ }
+ 
+ .btn-dark:hover {
+   background: var(--gold-dark);
+   border-color: var(--gold-dark);
+   color: #fff;
+ }
+ 
+ .btn,
+ .btn-dark,
+ .btn-light,
+ .btn-outline,
+ .icon-btn,
+ .hamburger,
+ .search-toggle,
+ .nav-links a {
+   outline: none;
+ }
+ 
+ .btn:focus-visible,
+ .btn-dark:focus-visible,
+ .btn-light:focus-visible,
+ .btn-outline:focus-visible,
+ .icon-btn:focus-visible,
+ .hamburger:focus-visible,
+ .search-toggle:focus-visible,
+ .nav-links a:focus-visible {
+   outline: 3px solid rgba(154, 106, 63, 0.45);
+   outline-offset: 3px;
+ }
+ 
+ .spacing-top-big { margin-top: 42px; }
+.spacing-top-medium { margin-top: 34px; }
+.full-width-btn { width: 100%; }
 
 .hero {
-  min-height: 610px;
+  min-height: clamp(380px, 50vh, 610px);
   background-image: linear-gradient(90deg, rgba(25, 18, 13, 0.58), rgba(25, 18, 13, 0.06)), var(--hero-img);
   background-position: center 40%;
   background-size: cover;
@@ -338,7 +377,7 @@ h3 { font-size: 24px; }
 
 .hero-content {
   max-width: 520px;
-  margin-left: clamp(36px, 8vw, 120px);
+  margin-left: clamp(16px, 6vw, 120px);
 }
 
 .hero h1 {
@@ -380,7 +419,7 @@ h3 { font-size: 24px; }
   overflow: hidden;
   display: flex;
   align-items: center;
-  padding: 42px;
+  padding: clamp(18px, 4vw, 42px);
   color: #fff;
 }
 
@@ -407,7 +446,7 @@ h3 { font-size: 24px; }
 }
 
 .category-card h2 {
-  font-size: 33px;
+  font-size: clamp(20px, 2.6vw, 33px);
   text-transform: uppercase;
   letter-spacing: .04em;
 }
@@ -418,7 +457,7 @@ h3 { font-size: 24px; }
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 26px;
   align-items: start;
 }
@@ -472,7 +511,7 @@ h3 { font-size: 24px; }
 
 .product-card h3 {
   font-family: "Inter", sans-serif;
-  font-size: 15px;
+  font-size: clamp(14px, 1.2vw, 16px);
   font-weight: 600;
   margin-top: 10px;
   margin-bottom: 0;
@@ -531,24 +570,25 @@ h3 { font-size: 24px; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 34px;
-  padding: 0 14px;
-  border: 1px solid #9A6B3F;
-  border-radius: 4px;
-  background: #A87444;
-  color: #FFFFFF;
-  font-size: 11px;
+  min-height: 36px;
+  padding: 0 clamp(8px, 2.4vw, 14px);
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--brown);
+  font-size: clamp(12px, 1.1vw, 13px);
   font-weight: 800;
   letter-spacing: .08em;
   line-height: 1;
   text-transform: uppercase;
-  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease, color 180ms ease;
 }
 
 .card-buy-now:hover {
-  border-color: var(--gold);
-  background: var(--cream);
-  transform: translateY(-1px);
+  border-color: var(--gold-dark);
+  background: linear-gradient(180deg, rgba(154,106,63,0.10), rgba(154,106,63,0.06));
+  color: #fff;
+  transform: translateY(-2px);
 }
 
 .feature-grid {
@@ -790,7 +830,7 @@ h3 { font-size: 24px; }
 }
 
 .shop-grid {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 30px 24px;
 }
 
@@ -1554,6 +1594,7 @@ h3 { font-size: 24px; }
     align-items: stretch;
     gap: 0;
     padding: 10px 24px 22px;
+    white-space: normal;
   }
 
   .nav-links.open { display: flex; }
@@ -1960,4 +2001,61 @@ h3 { font-size: 24px; }
   .shop-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Additional refined breakpoints to smooth transitions and fix layout jumps */
+@media (max-width: 1024px) {
+  /* make product cards slightly smaller to fit better on tablets */
+  .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  .hero h1 {
+    font-size: clamp(30px, 5.2vw, 48px);
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 620px) {
+  /* ensure call-to-action buttons inside cards are easy to tap */
+  .card-buy-now {
+    width: 100%;
+    display: block;
+    padding: 10px 12px;
+    text-align: center;
+  }
+
+  .category-card {
+    padding: 18px;
+  }
+
+  .hero h1 {
+    font-size: clamp(24px, 6.2vw, 34px);
+  }
+
+  .nav {
+    height: 68px;
+  }
+
+  .brand { font-size: clamp(20px, 6vw, 28px); }
+}
+
+@media (max-width: 420px) {
+  /* tighten spacing and ensure readable type on very small screens */
+  body { font-size: 14px; }
+
+  .hero-content { max-width: 280px; margin-left: 12px; }
+
+  .btn { min-height: 42px; font-size: 13px; }
+
+  .category-card h2 { font-size: clamp(18px, 5.8vw, 22px); }
 }
